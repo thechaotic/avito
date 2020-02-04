@@ -19,7 +19,7 @@ class App extends React.Component{
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.handleGetIdImage = this.handleGetIdImage.bind(this);
-    this.handleGetBigImage = this.handleGetBigImage.bind(this);
+    // this.handleGetBigImage = this.handleGetBigImage.bind(this);
   }
   handleClose() {
 		this.setState({ show: false });
@@ -30,17 +30,22 @@ class App extends React.Component{
   }
   handleGetIdImage(e){
     this.setState({pictureId: e.target.id})
-    
-    
-  }
-  handleGetBigImage(){
     fetch('https://boiling-refuge-66454.herokuapp.com/images/'+this.state.pictureId)
     .then(result => result.json())
     .then(data => {
         this.setState({ bigImages: data})
         console.log(this.state.bigImages)
     })
-  }      
+    
+  }
+  // handleGetBigImage(){
+  //   fetch('https://boiling-refuge-66454.herokuapp.com/images/'+this.state.pictureId)
+  //   .then(result => result.json())
+  //   .then(data => {
+  //       this.setState({ bigImages: data})
+  //       console.log(this.state.bigImages)
+  //   })
+  // }      
     
     
   
@@ -63,7 +68,7 @@ class App extends React.Component{
 
   render(){   
     
-    // console.log(this.state.pictureId)
+    console.log(this.state.bigImages)
     return( 
       <div className="container">
           <header>
@@ -83,7 +88,7 @@ class App extends React.Component{
                         src={element.url}
                         id={element.id}
                         onClick={this.handleGetIdImage}
-                        onClick={this.handleGetBigImage}
+                        // onClick={this.handleGetBigImage}
                        />
                     </div>
                   ))}    
