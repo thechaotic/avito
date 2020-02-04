@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
-
+import axios from 'axios';
 
 
 
@@ -11,12 +11,15 @@ class App extends React.Component{
     super(props)
     this.state = {
       images : [],
-      picture: [],
+      pictureId: 0,
       bigImages: [],
       show: false,
+      big: []
     }
     this.handleShow = this.handleShow.bind(this);
-		this.handleClose = this.handleClose.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleGetIdImage = this.handleGetIdImage.bind(this);
+    this.handleGetBigImage = this.handleGetBigImage.bind(this);
   }
   handleClose() {
 		this.setState({ show: false });
@@ -24,18 +27,43 @@ class App extends React.Component{
 
 	handleShow() {
 		this.setState({ show: true });
-	}
+  }
+  handleGetIdImage(e){
+    this.setState({pictureId: e.target.id})
+    
+    
+  }
+  handleGetBigImage(){
+    fetch('https://boiling-refuge-66454.herokuapp.com/images/'+this.state.pictureId)
+    .then(result => result.json())
+    .then(data => {
+        this.setState({ bigImages: data})
+        console.log(this.state.bigImages)
+    })
+  }      
+    
+    
+  
   
   async componentDidMount(){
     const url = "https://boiling-refuge-66454.herokuapp.com/images"
     const response = await fetch(url)
     const data = await response.json()
     //  console.log(data)
-    this.setState({images: data})
-    // console.log(this.state.images)  
+    this.setState({
+      images: data,
+      
+    })
+    // console.log(this.state.images); 
+    
     }
 
+    
+    
+
   render(){   
+    
+    // console.log(this.state.pictureId)
     return( 
       <div className="container">
           <header>
@@ -48,12 +76,14 @@ class App extends React.Component{
               <main className="col-md-12 col-lg-12 ">
                 <div className="row">
                   {this.state.images.map(element =>(
-                    <div className="col-md-4 my-lg-4 my-md-4 my-sm-4" key={element.id}  >
+                    <div className="col-md-4 my-lg-4 my-md-4 my-sm-4" key={element.id}  onClick={this.handleShow}>
                       <img  
                         alt="preview" 
                         className="img-thumbnail" 
                         src={element.url}
-                        onClick={this.handleShow}
+                        id={element.id}
+                        onClick={this.handleGetIdImage}
+                        onClick={this.handleGetBigImage}
                        />
                     </div>
                   ))}    
