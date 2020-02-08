@@ -33,7 +33,6 @@ class App extends React.Component{
   }
 
   handleChangeComments(e){
-    
     this.setState({
       comments: e.target.value
     })
@@ -43,8 +42,6 @@ class App extends React.Component{
   }
 
   handleGetIdImage(e){
-    
-    
     fetch('https://boiling-refuge-66454.herokuapp.com/images/'+e.target.id)
     .then(result => result.json())
     .then(data => {
@@ -54,32 +51,20 @@ class App extends React.Component{
                         })
         console.log(this.state.bigImages)
     })
-    
-    
   }
- 
-    
-    
-  
-  
+
   async componentDidMount(){
     const url = "https://boiling-refuge-66454.herokuapp.com/images"
     const response = await fetch(url)
     const data = await response.json()
     //  console.log(data)
     this.setState({
-      images: data,
-      
+      images: data,  
     })
     // console.log(this.state.images); 
-    
     }
 
-    
-    
-
   render(){   
-    
     // console.log(this.state.comments)
     return( 
       <div className="container">
