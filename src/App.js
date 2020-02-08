@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
-
+import moment from 'moment'
 
 
 
@@ -15,12 +15,14 @@ class App extends React.Component{
       bigImages: [],
       show: false,
       info: [],
-      
+      date: 0,
+      comments: ''
     }
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.handleGetIdImage = this.handleGetIdImage.bind(this);
-    
+    this.handleSendComments = this.handleSendComments.bind(this);
+    this.handleChangeComments = this.handleChangeComments.bind(this);
   }
   handleClose() {
 		this.setState({ show: false });
@@ -29,6 +31,17 @@ class App extends React.Component{
 	handleShow() {
 		this.setState({ show: true });
   }
+
+  handleChangeComments(e){
+    
+    this.setState({
+      comments: e.target.value
+    })
+  }
+  handleSendComments(){
+    console.log(this.state.comments)
+  }
+
   handleGetIdImage(e){
     
     
@@ -37,9 +50,11 @@ class App extends React.Component{
     .then(data => {
         this.setState({ bigImages: data,
                         info: data.comments[0],
+                        date: moment(data.comments[0].date).format("DD.MM.YYYY")
                         })
-        // console.log(this.state.bigImages)
+        console.log(this.state.bigImages)
     })
+    
     
   }
  
@@ -65,7 +80,7 @@ class App extends React.Component{
 
   render(){   
     
-    console.log(this.state.info)
+    // console.log(this.state.comments)
     return( 
       <div className="container">
           <header>
@@ -90,30 +105,43 @@ class App extends React.Component{
                   ))}    
                 </div>   
                 <Modal show={this.state.show} onHide={this.handleClose}>
-					        <Modal.Header closeButton>
-						        
-				      	</Modal.Header>
+                  <Modal.Header closeButton> 
+                  </Modal.Header>
 					        <Modal.Body >
-                  <div className="container">
-                    <div className="row">  
-                      <div className="col-md-8 col-lg-8  bigimage">
-                        <img
-                          className="img-fluid"
-                          src={this.state.bigImages.url}
-                        >
-                        </img> 
-                      </div>
-                        <div className="col-md-4 col-lg-4 coment">
-                  <p></p>
-                          <p>{this.state.info.text}</p>
+                    <div className="container">
+                      <div className="row">  
+                        <div className="col-md-8 col-lg-8  bigimage">
+                          <img
+                            className="img-fluid"
+                            src={this.state.bigImages.url}
+                          >
+                          </img> 
                         </div>
-                          <div className="col-md-8 col-lg-8  coment">
-                            <input type="text" className="col-md-12 col-lg-12 mt-4 "/>
-                            <input type="text" className="col-md-12 col-lg-12 mt-4 "/>
-                            <button className="col-md-12 col-lg-12 mt-4 ">Оставить комментарий</button>
+                          <div className="col-md-4 col-lg-4 coment">
+                            <p className="date"> {this.state.date} </p>
+                            <p className="comments">{this.state.info.text}</p>
                           </div>
-                    </div>
-                    </div>
+                            <div className="col-md-8 col-lg-8  coment">
+                              <input 
+                                type="text" 
+                                className="col-md-12 col-lg-12 mt-4 rounded " 
+                                placeholder="Ваше имя" 
+                              />
+                              <input 
+                                type="text" 
+                                className="col-md-12 col-lg-12 mt-4 rounded" 
+                                placeholder="Ваш комментарий" 
+                                value={this.state.comments}
+                                onChange={this.handleChangeComments}
+                              />
+                              <button 
+                                className="col-md-12 col-lg-12 mt-4 rounded mybtn btn btn-primary "
+                                onClick={this.handleSendComments}
+                                >Оставить комментарий
+                              </button>
+                            </div>
+                        </div>
+                      </div>
                   </Modal.Body>
 				        </Modal>
               </main>
