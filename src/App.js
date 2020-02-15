@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import moment from 'moment'
 
+import axios from 'axios';
+
 
 
 class App extends React.Component{
@@ -15,14 +17,17 @@ class App extends React.Component{
       bigImages: [],
       show: false,
       info: [],
-      date: 0,
-      comments: ''
+      comments: [],
+      bigImageId: 0,
+      name: [],
+      
     }
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.handleGetIdImage = this.handleGetIdImage.bind(this);
     this.handleSendComments = this.handleSendComments.bind(this);
     this.handleChangeComments = this.handleChangeComments.bind(this);
+    this.handleChangeName = this.handleChangeName.bind(this);
   }
   handleClose() {
 		this.setState({ show: false });
@@ -37,19 +42,39 @@ class App extends React.Component{
       comments: e.target.value
     })
   }
-  handleSendComments(){
-    console.log(this.state.comments)
+
+  handleChangeName(e){
+    this.setState({
+      name: e.target.value
+    })
+  }
+  handleSendComments(e){
+    axios.post('https://boiling-refuge-66454.herokuapp.com/images/'+this.state.bigImageId+'/comments', {	 
+      name: this.state.name, 
+      comment: this.state.comments
+    }, {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+        }
+              })
+    .then(response => { 
+      console.log(response)
+    })
+    .catch(error => {
+        console.log(error.response)
+    })
+
   }
 
-  handleGetIdImage(e){
-    fetch('https://boiling-refuge-66454.herokuapp.com/images/'+e.target.id)
+  handleGetIdImage(element){
+    fetch('https://boiling-refuge-66454.herokuapp.com/images/'+element)
     .then(result => result.json())
     .then(data => {
         this.setState({ bigImages: data,
-                        info: data.comments[0],
-                        date: moment(data.comments[0].date).format("DD.MM.YYYY")
-                        })
-        console.log(this.state.bigImages)
+                        info: data.comments,
+                        bigImageId: element
+                      })
+        // console.log(this.state.bigImageId)
     })
   }
 
@@ -65,14 +90,14 @@ class App extends React.Component{
     }
 
   render(){   
-    // console.log(this.state.comments)
+    console.log(this.state.name)
     return( 
       <div className="container">
-          <header>
-            <div className="text-center">
-              <h1> test app </h1> 
-            </div>
-          </header>
+        <header>
+          <div className="text-center">
+            <h1> test app </h1> 
+          </div>
+        </header>
           <section>
             <div className="row">
               <main className="col-md-12 col-lg-12 ">
@@ -84,7 +109,7 @@ class App extends React.Component{
                         className="img-thumbnail" 
                         src={element.url}
                         id={element.id}
-                        onClick={this.handleGetIdImage}
+                        onClick={(e)=>this.handleGetIdImage(element.id)}
                        />
                     </div>
                   ))}    
@@ -92,42 +117,48 @@ class App extends React.Component{
                 <Modal show={this.state.show} onHide={this.handleClose}>
                   <Modal.Header closeButton> 
                   </Modal.Header>
-					        <Modal.Body >
-                    <div className="container">
-                      <div className="row">  
-                        <div className="col-md-8 col-lg-8  bigimage">
-                          <img
-                            className="img-fluid"
-                            src={this.state.bigImages.url}
-                          >
-                          </img> 
-                        </div>
-                          <div className="col-md-4 col-lg-4 coment">
-                            <p className="date"> {this.state.date} </p>
-                            <p className="comments">{this.state.info.text}</p>
+                    <Modal.Body >
+                      <div className="container">
+                        <div className="row">  
+                          <div className="col-md-8 col-lg-8  bigimage">
+                            <img
+                              className="img-fluid"
+                              src={this.state.bigImages.url}
+                              alt="bigimage"
+                            />  
                           </div>
-                            <div className="col-md-8 col-lg-8  coment">
-                              <input 
-                                type="text" 
-                                className="col-md-12 col-lg-12 mt-4 rounded " 
-                                placeholder="Ваше имя" 
-                              />
-                              <input 
-                                type="text" 
-                                className="col-md-12 col-lg-12 mt-4 rounded" 
-                                placeholder="Ваш комментарий" 
-                                value={this.state.comments}
-                                onChange={this.handleChangeComments}
-                              />
-                              <button 
-                                className="col-md-12 col-lg-12 mt-4 rounded mybtn btn btn-primary "
-                                onClick={this.handleSendComments}
-                                >Оставить комментарий
-                              </button>
-                            </div>
+                            {this.state.info.map(el=>(
+                              <div className="col-md-4 col-lg-4 coment" key={el.id}>
+                                <p className="date">{moment(el.date).format("DD.MM.YYYY")}</p>
+                                <p className="comments">{el.text}</p>
+                              </div>
+                            ))}
+                              <div className="col-md-8 col-lg-8  coment">
+                                <input 
+                                  type="text" 
+                                  className="col-md-12 col-lg-12 mt-4 rounded " 
+                                  placeholder="Ваше имя" 
+                                  value={this.state.name}
+                                  onChange={this.handleChangeName}
+                                />
+
+                                <input 
+                                  type="text" 
+                                  className="col-md-12 col-lg-12 mt-4 rounded" 
+                                  placeholder="Ваш комментарий" 
+                                  value={this.state.comments}
+                                  onChange={this.handleChangeComments}
+                                />
+
+                                <button 
+                                  className="col-md-12 col-lg-12 mt-4 rounded mybtn btn btn-primary "
+                                  onClick={this.handleSendComments}
+                                  >Оставить комментарий
+                                </button>
+                              </div>
+                          </div>
                         </div>
-                      </div>
-                  </Modal.Body>
+                    </Modal.Body>
 				        </Modal>
               </main>
             </div>
